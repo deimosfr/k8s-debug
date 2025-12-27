@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: debug
+spec:
+  selector:
+    matchLabels:
+      app: debug
+  template:
+    metadata:
+      labels:
+        app: debug
+      name: debug
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: linux
+        image: deimosfr/k8s-debug:1.0
+        imagePullPolicy: Always
+        args:
+        - sleep
+        - "604800"
+        securityContext:
+          privileged: true
+          runAsGroup: 0
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /mnt/host
+          name: host
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host
